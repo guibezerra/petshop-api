@@ -13,8 +13,9 @@ import java.util.Objects;
 
 @Component
 public class ClienteInputDisassembler extends ObjectInputDisassembler<ClienteInput, Cliente> {
-    public Cliente toDomainObject(ClienteInput clienteInput) {
+    public Cliente toDomainObjectSkipingProperties(ClienteInput clienteInput) {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
 
         TypeMap<ClienteInput, Cliente> typeMap = modelMapper.getTypeMap(ClienteInput.class, Cliente.class);
         if(Objects.isNull(typeMap)) {
@@ -23,15 +24,26 @@ public class ClienteInputDisassembler extends ObjectInputDisassembler<ClienteInp
                 protected void configure() {
                     map().getEndereco().setIdEndereco(null);
                     map().getEndereco().setCliente(null);
-                    map().getEndereco().setLogradouro(clienteInput.getEndereco().getLogradouro());
-                    map().getEndereco().setCidade(clienteInput.getEndereco().getCidade());
-                    map().getEndereco().setBairro(clienteInput.getEndereco().getBairro());
-                    map().getEndereco().setComplemento(clienteInput.getEndereco().getComplemento());;
-                    map().getEndereco().setTag(clienteInput.getEndereco().getTag());
                 }
             });
         }
 
         return modelMapper.map(clienteInput, Cliente.class);
+    }
+
+    public void copyToDomainObjectSkippingProperties(ClienteInput clienteInput, Cliente cliente) {
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
+
+        TypeMap<ClienteInput, Cliente> typeMap = modelMapper.getTypeMap(ClienteInput.class, Cliente.class);
+        if(Objects.isNull(typeMap)) {
+            modelMapper.addMappings(new PropertyMap<ClienteInput, Cliente>() {
+                @Override
+                protected void configure() {
+                    map().getEndereco().setIdEndereco(null);
+                }
+            });
+        }
+
+        modelMapper.map(clienteInput, cliente);
     }
 }

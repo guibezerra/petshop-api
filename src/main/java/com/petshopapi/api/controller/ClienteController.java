@@ -58,13 +58,13 @@ public class ClienteController {
         Cliente clienteAtual = clienteService.buscarPorId(idCliente);
         String cpfAntesDeAtualizar = clienteAtual.getCpf();
 
-        clienteInputDisassembler.copyToDomainObject(clienteInput, clienteAtual);
+        clienteInputDisassembler.copyToDomainObjectSkippingProperties(clienteInput, clienteAtual);
         clienteAtual.setIdCliente(idCliente);
 
         usuarioService.atualizaDadosDeUsuarioAPartirDeCliente(clienteAtual, cpfAntesDeAtualizar);
 
         if(Objects.isNull(clienteAtual.getEndereco())) {
-            Endereco endereco = enderecoInputDisassembler.toDomainObject(clienteInput.getEndereco());
+            Endereco endereco = enderecoInputDisassembler.toDomainObjectSkippingProperties(clienteInput.getEndereco());
 
             clienteAtual.setEndereco(endereco);
 

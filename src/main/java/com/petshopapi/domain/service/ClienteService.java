@@ -8,7 +8,6 @@ import com.petshopapi.domain.model.Endereco;
 import com.petshopapi.domain.repository.ClienteRepository;
 import com.petshopapi.domain.repository.ContatoRepository;
 import com.petshopapi.domain.repository.EnderecoRepository;
-import com.petshopapi.domain.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,16 +29,12 @@ public class ClienteService {
     private EnderecoRepository enderecoRepository;
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
     private ContatoInputDisassembler contatoInputDisassembler;
 
     final int QUANTIDADE_MAXIMA_DE_CONTATOS_PERMITIDA_NUMA_LISTA = 2;
 
     @PersistenceContext
     private EntityManager entityManager;
-
 
     @Transactional(readOnly = true)
     public Cliente buscarPorCpf(String cpf) {

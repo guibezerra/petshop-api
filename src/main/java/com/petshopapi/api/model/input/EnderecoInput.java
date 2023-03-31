@@ -6,7 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EnderecoInput {
-//    private ClienteIdInput clienteIdInput;
     private String logradouro;
     private String cidade;
     private String bairro;

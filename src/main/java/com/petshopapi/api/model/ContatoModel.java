@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 public class ContatoModel {
     private Long idContato;
-    private ClienteModel cliente;
     private TagContato tagContato;
     private TipoContato tipoContato;
     private String valor;

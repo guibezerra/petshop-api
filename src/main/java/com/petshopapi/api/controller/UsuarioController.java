@@ -9,7 +9,6 @@ import com.petshopapi.api.model.UsuarioModel;
 import com.petshopapi.api.model.input.UsuarioInput;
 import com.petshopapi.domain.model.Cliente;
 import com.petshopapi.domain.model.Usuario;
-import com.petshopapi.domain.service.ClienteService;
 import com.petshopapi.domain.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,9 +34,6 @@ public class UsuarioController {
 
     @Autowired
     UsuarioService usuarioService;
-
-    @Autowired
-    private ClienteService clienteService;
 
     @GetMapping("/{cpf}")
     public UsuarioModel buscarUsuarioPorCpf(@PathVariable String cpf) {
