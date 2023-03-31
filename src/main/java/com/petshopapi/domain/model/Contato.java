@@ -1,6 +1,7 @@
 package com.petshopapi.domain.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +17,8 @@ public class Contato {
     @Column(name = "id_contato")
     private Long idContato;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+
+    @ManyToOne
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 

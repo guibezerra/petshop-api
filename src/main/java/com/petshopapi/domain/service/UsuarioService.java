@@ -134,4 +134,19 @@ public class UsuarioService {
     private boolean existsContatosParaCliente(Long idCliente) {
         return contatoRepository.existsByIdCliente(idCliente);
     }
+
+    @Transactional
+    public void atualizaDadosDeUsuarioAPartirDeCliente(Cliente clienteAtual, String cpfAntigo) {
+        Usuario usuarioAtual = usuarioRepository.findByCpf(cpfAntigo).get();
+        Long idUsuario = usuarioAtual.getIdUsuario();
+
+        entityManager.detach(usuarioAtual);
+
+        usuarioAtual.setIdUsuario(idUsuario);
+        usuarioAtual.setNome(clienteAtual.getNome());
+        usuarioAtual.setCpf(clienteAtual.getCpf());
+
+        usuarioRepository.updateUsuario(usuarioAtual.getCpf(), usuarioAtual.getNome(),
+                usuarioAtual.getSenha(), usuarioAtual.getIdUsuario());
+    }
 }

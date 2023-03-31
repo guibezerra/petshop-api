@@ -2,12 +2,15 @@ package com.petshopapi.api.controller;
 
 import com.petshopapi.api.assembler.*;
 import com.petshopapi.api.model.ClienteModel;
+import com.petshopapi.api.model.ContatoModel;
+import com.petshopapi.api.model.EnderecoModel;
 import com.petshopapi.api.model.input.ClienteInput;
 import com.petshopapi.api.model.input.ContatoInput;
 import com.petshopapi.domain.model.Cliente;
 import com.petshopapi.domain.model.Contato;
 import com.petshopapi.domain.model.Endereco;
 import com.petshopapi.domain.service.ClienteService;
+import com.petshopapi.domain.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +41,8 @@ public class ClienteController {
     @Autowired
     EnderecoModelAssembler enderecoModelAssembler;
 
+    @Autowired
+    UsuarioService usuarioService;
 
     @GetMapping("/{idCliente}")
     public ClienteModel buscarClientePorId(@PathVariable Long idCliente) {
@@ -48,41 +53,15 @@ public class ClienteController {
         return clienteModel;
     }
 
-//    @PostMapping
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public ClienteModel salvarCliente(@RequestBody ClienteInput clienteInput) {
-//        Cliente cliente = clienteInputDisassembler.toDomainObject(clienteInput);
-//
-//        List<Contato> contatos = new ArrayList<>();
-//        converterContatosInputParaDomainObjectEAssociaACliente(contatos, clienteInput, cliente);
-//
-//        cliente = clienteService.salvarCliente(cliente);
-//
-//        return clienteModelAssembler.toModel(cliente);
-//    }
-
-    private void converterContatosInputParaDomainObjectEAssociaACliente(List<Contato> contatos, ClienteInput clienteInput, Cliente cliente) {
-        clienteInput.getContato().stream()
-                .forEach(contatoInput ->
-                        contatos.add(contatoInputDisassembler.toDomainObject(contatoInput)));
-
-        cliente.setContatos(contatos);
-    }
-
-    private ClienteModel associaResultadosAosDomainObjectsERetornaClienteModel(List<Object> resultadoCadastramento, Cliente cliente, Endereco endereco,  List<Contato> contatos) {
-        ClienteModel clienteModel = clienteModelAssembler.toModel(cliente);
-        clienteModel.setEndereco(enderecoModelAssembler.toModel(endereco));
-        clienteModel.setContato(contatoModelAssembler.toCollectionModel(contatos));
-
-        return clienteModel;
-    }
-
     @PutMapping("/{idCliente}")
-    public Cliente alterarCliente(@PathVariable Long idCliente, @RequestBody ClienteInput clienteInput) {
+    public ClienteModel alterarCliente(@PathVariable Long idCliente, @RequestBody ClienteInput clienteInput) {
         Cliente clienteAtual = clienteService.buscarPorId(idCliente);
+        String cpfAntesDeAtualizar = clienteAtual.getCpf();
 
         clienteInputDisassembler.copyToDomainObject(clienteInput, clienteAtual);
         clienteAtual.setIdCliente(idCliente);
+
+        usuarioService.atualizaDadosDeUsuarioAPartirDeCliente(clienteAtual, cpfAntesDeAtualizar);
 
         if(Objects.isNull(clienteAtual.getEndereco())) {
             Endereco endereco = enderecoInputDisassembler.toDomainObject(clienteInput.getEndereco());
@@ -95,9 +74,32 @@ public class ClienteController {
 
         List<ContatoInput> contatoInputs = clienteInput.getContato();
 
-        Cliente clienteSalvo = clienteService.salvarRegistrosEAtualizar(clienteAtual, contatoInputs);
+        List<Object> resultadoCadastramento = clienteService.salvarRegistrosEAtualizar(clienteAtual, contatoInputs);
 
-        return clienteSalvo;
+        return retornaClienteModel(resultadoCadastramento);
+    }
+
+    private ClienteModel retornaClienteModel(List<Object> resultadoCadastramento) {
+        ClienteModel clienteModel = new ClienteModel();
+        for (Object objeto : resultadoCadastramento) {
+            if(objeto.getClass().equals(Cliente.class)) {
+                clienteModel = clienteModelAssembler.toModel((Cliente) objeto);
+            }
+
+            if (objeto.getClass().equals(Endereco.class)) {
+                EnderecoModel enderecoModel = enderecoModelAssembler.toModel((Endereco) objeto);
+
+                clienteModel.setEndereco(enderecoModel);
+            }
+
+            if (objeto instanceof List<?>) {
+                List<ContatoModel> contatoModels = contatoModelAssembler.toCollectionModel((List<Contato>) objeto);
+
+                clienteModel.setContato(contatoModels);
+            }
+        }
+
+        return clienteModel;
     }
 
 }

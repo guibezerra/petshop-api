@@ -1,8 +1,12 @@
 package com.petshopapi.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -28,9 +32,11 @@ public class Cliente {
     @Column(name = "data_de_cadastro")
     private LocalDate dataDeCadastro;
 
+    @Transient
     @OneToOne(mappedBy = "cliente")
     private Endereco endereco;
 
+    @Transient
     @OneToMany(mappedBy = "cliente")
     private List<Contato> contatos;
 

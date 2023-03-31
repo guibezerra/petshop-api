@@ -1,10 +1,10 @@
 package com.petshopapi.domain.service;
 
-import com.petshopapi.api.assembler.ClienteInputDisassembler;
 import com.petshopapi.api.assembler.ContatoInputDisassembler;
-import com.petshopapi.api.model.input.ClienteInput;
 import com.petshopapi.api.model.input.ContatoInput;
-import com.petshopapi.domain.model.*;
+import com.petshopapi.domain.model.Cliente;
+import com.petshopapi.domain.model.Contato;
+import com.petshopapi.domain.model.Endereco;
 import com.petshopapi.domain.repository.ClienteRepository;
 import com.petshopapi.domain.repository.ContatoRepository;
 import com.petshopapi.domain.repository.EnderecoRepository;
@@ -17,7 +17,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class ClienteService {
@@ -54,69 +53,15 @@ public class ClienteService {
                 .orElseThrow(() -> new RuntimeException());
     }
 
-//    @Transactional
-//    public Cliente salvarCliente(Cliente cliente) {
-//        vertificaSeClientePossuiCadastroDeUsuario(cliente);
-//
-//        Cliente clienteSalvo = atualizaSalvaERetornaObjetoCliente(cliente);
-//
-//        preparaESalvaEndereco(clienteSalvo, cliente.getEndereco());
-//        preparaESalvaContatos(clienteSalvo, cliente.getContatos());
-//
-//        return clienteSalvo;
-//    }
-//
-//    private void vertificaSeClientePossuiCadastroDeUsuario(Cliente cliente) {
-//        boolean isUsuarioTipoCliente = usuarioRepository.existsByCpfETipo(cliente.getCpf(), TipoPerfil.CLIENTE);
-//
-//        if(isUsuarioTipoCliente) {
-//            Usuario usuarioAtual = usuarioRepository.findByCpf(cliente.getCpf()).get();
-//
-//            entityManager.detach(usuarioAtual);
-//
-//            usuarioAtual.setNome(cliente.getNome());
-//
-//            usuarioRepository.save(usuarioAtual);
-//
-//        } else {
-//            throw new RuntimeException();
-//        }
-//    }
-//
-//    private Cliente atualizaSalvaERetornaObjetoCliente(Cliente cliente) {
-//        Cliente clienteAtual = buscarPorCpf(cliente.getCpf());
-//
-//        clienteAtual.setNome(cliente.getNome());
-//
-//        return clienteRepository.save(clienteAtual);
-//    }
-//
-//    private void preparaESalvaEndereco(Cliente clienteSalvo, Endereco endereco) {
-//        endereco.setCliente(clienteSalvo);
-//
-//        endereco = enderecoRepository.save(endereco);
-//
-//        clienteSalvo.setEndereco(endereco);
-//    }
-//
-//    private void preparaESalvaContatos(Cliente clienteSalvo, List<Contato> contatos) {
-//        contatos.stream().forEach(contato -> contato.setCliente(clienteSalvo));
-//
-//        contatos = contatoRepository.saveAll(contatos);
-//
-//        clienteSalvo.setContatos(contatos);
-//    }
-
     @Transactional
-    public Cliente salvarRegistrosEAtualizar(Cliente clienteAtual, List<ContatoInput> contatoInputs) {
+    public List<Object> salvarRegistrosEAtualizar(Cliente clienteAtual, List<ContatoInput> contatoInputs) {
         entityManager.detach(clienteAtual);
 
-//        validaEAtualizaContatosAtuaisComContatosInput(clienteAtual, contatoInputs);
-//        preparaESalvaContatos(clienteAtual, clienteAtual.getContatos());
-//        preparaESalvaEndereco(clienteAtual, clienteAtual.getEndereco());
-//        atualizaDadosDeUsuario(clienteAtual);
+        validaEAtualizaContatosAtuaisComContatosInput(clienteAtual, contatoInputs);
+        preparaESalvaContatos(clienteAtual, clienteAtual.getContatos());
+        preparaESalvaEndereco(clienteAtual, clienteAtual.getEndereco());
 
-        return clienteRepository.save(clienteAtual);
+        return salvaEPreparaClienteParaRetorno(clienteAtual);
     }
 
     private void validaEAtualizaContatosAtuaisComContatosInput(Cliente cliente, List<ContatoInput> contatosInput) {
@@ -174,7 +119,7 @@ public class ClienteService {
     private void preparaESalvaContatos(Cliente clienteSalvo, List<Contato> contatos) {
         contatos.stream().forEach(contato -> contato.setCliente(clienteSalvo));
 
-        contatos = contatoRepository.saveAll(contatos);
+        contatos = contatoRepository.saveAllAndFlush(contatos);
 
         clienteSalvo.setContatos(contatos);
     }
@@ -194,15 +139,18 @@ public class ClienteService {
         clienteSalvo.setEndereco(endereco);
     }
 
-    private void atualizaDadosDeUsuario(Cliente clienteAtual) {
-        Usuario usuarioAtual = usuarioRepository.findByCpf(clienteAtual.getCpf()).get();
+    private List<Object> salvaEPreparaClienteParaRetorno(Cliente clienteAtual) {
+        Endereco enderecoSalvo = clienteAtual.getEndereco();
+        List<Contato> contatosSalvos = clienteAtual.getContatos();
 
-        entityManager.detach(usuarioAtual);
+        clienteRepository.save(clienteAtual);
 
-        usuarioAtual.setNome(clienteAtual.getNome());
-        usuarioAtual.setCpf(clienteAtual.getCpf());
+        List<Object> resultadoCadastramentro = new ArrayList<>();
 
-        usuarioRepository.save(usuarioAtual);
+        resultadoCadastramentro.add(clienteAtual);
+        resultadoCadastramentro.add(enderecoSalvo);
+        resultadoCadastramentro.add(contatosSalvos);
+
+        return resultadoCadastramentro;
     }
-
 }

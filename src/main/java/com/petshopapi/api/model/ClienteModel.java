@@ -15,6 +15,6 @@ public class ClienteModel {
     private String nome;
     private String cpf;
     private LocalDate dataDeCadastro;
-    private List<ContatoModel> contato;
     private EnderecoModel endereco;
+    private List<ContatoModel> contato;
 }
