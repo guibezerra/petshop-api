@@ -1,18 +1,21 @@
 package com.petshopapi.domain.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 
+
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Setter
 @Entity
 @Table(name="usuario")
 public class Usuario {
+    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id_usuario")
     private Long idUsuario;
 
     @Column(name="cpf")
@@ -21,10 +24,14 @@ public class Usuario {
     @Column(name="nome")
     private String nome;
 
-//    @Column(name="tipo_usuario")
-//    private TipoUsuario tipoUsuario;
+    @Column(name="perfil")
+    @Enumerated(EnumType.STRING)
+    private TipoPerfil tipoPerfil;
 
     @Column(name="senha")
     private String senha;
 
+    @Transient
+    @OneToOne(mappedBy = "usuario")
+    private Cliente cliente;
 }
