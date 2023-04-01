@@ -2,9 +2,7 @@ package com.petshopapi.domain.service;
 
 import com.petshopapi.api.assembler.ContatoInputDisassembler;
 import com.petshopapi.api.model.input.ContatoInput;
-import com.petshopapi.domain.model.Cliente;
-import com.petshopapi.domain.model.Contato;
-import com.petshopapi.domain.model.Endereco;
+import com.petshopapi.domain.model.*;
 import com.petshopapi.domain.repository.ClienteRepository;
 import com.petshopapi.domain.repository.ContatoRepository;
 import com.petshopapi.domain.repository.EnderecoRepository;
@@ -38,8 +36,10 @@ public class ClienteService {
 
     @Transactional(readOnly = true)
     public Cliente buscarPorCpf(String cpf) {
-        return clienteRepository.findByCpf(cpf)
+       Cliente cliente =  clienteRepository.findByCpf(cpf)
                 .orElseThrow(() -> new RuntimeException());
+
+        return cliente;
     }
 
     @Transactional
@@ -49,14 +49,12 @@ public class ClienteService {
     }
 
     @Transactional
-    public List<Object> salvarRegistrosEAtualizar(Cliente clienteAtual, List<ContatoInput> contatoInputs) {
-        entityManager.detach(clienteAtual);
-
+    public Cliente salvarRegistrosEAtualizar(Cliente clienteAtual, List<ContatoInput> contatoInputs) {
         validaEAtualizaContatosAtuaisComContatosInput(clienteAtual, contatoInputs);
         preparaESalvaContatos(clienteAtual, clienteAtual.getContatos());
         preparaESalvaEndereco(clienteAtual, clienteAtual.getEndereco());
 
-        return salvaEPreparaClienteParaRetorno(clienteAtual);
+        return clienteAtual;
     }
 
     private void validaEAtualizaContatosAtuaisComContatosInput(Cliente cliente, List<ContatoInput> contatosInput) {
@@ -78,6 +76,7 @@ public class ClienteService {
 
                     contatoInputDisassembler.copyToDomainObject(contatosInput.get(cont), contato);
                     contato.setIdContato(idContato);
+                    contato.setCliente(cliente);
 
                     cont++;
                 }
@@ -114,7 +113,7 @@ public class ClienteService {
     private void preparaESalvaContatos(Cliente clienteSalvo, List<Contato> contatos) {
         contatos.stream().forEach(contato -> contato.setCliente(clienteSalvo));
 
-        contatos = contatoRepository.saveAllAndFlush(contatos);
+        contatos = contatoRepository.saveAll(contatos);
 
         clienteSalvo.setContatos(contatos);
     }
@@ -132,20 +131,5 @@ public class ClienteService {
         endereco = enderecoRepository.save(endereco);
 
         clienteSalvo.setEndereco(endereco);
-    }
-
-    private List<Object> salvaEPreparaClienteParaRetorno(Cliente clienteAtual) {
-        Endereco enderecoSalvo = clienteAtual.getEndereco();
-        List<Contato> contatosSalvos = clienteAtual.getContatos();
-
-        clienteRepository.save(clienteAtual);
-
-        List<Object> resultadoCadastramentro = new ArrayList<>();
-
-        resultadoCadastramentro.add(clienteAtual);
-        resultadoCadastramentro.add(enderecoSalvo);
-        resultadoCadastramentro.add(contatosSalvos);
-
-        return resultadoCadastramentro;
     }
 }

@@ -7,26 +7,22 @@ import lombok.Setter;
 import javax.persistence.*;
 
 
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Setter
 @Entity
 @Table(name="usuario")
-@IdClass(UsuarioId.class)
 public class Usuario {
+    @EqualsAndHashCode.Include
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idUsuario;
+
     @Column(name="cpf")
     private String cpf;
 
-    @Id
     @Column(name="nome")
     private String nome;
-
-
-    @Column(name="id_usuario")
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_USUARIO")
-    @SequenceGenerator(name = "SEQ_USUARIO", sequenceName = "usuario_id_seq", allocationSize = 1)
-    private Long idUsuario;
 
     @Column(name="perfil")
     @Enumerated(EnumType.STRING)
@@ -34,4 +30,8 @@ public class Usuario {
 
     @Column(name="senha")
     private String senha;
+
+    @Transient
+    @OneToOne(mappedBy = "usuario")
+    private Cliente cliente;
 }

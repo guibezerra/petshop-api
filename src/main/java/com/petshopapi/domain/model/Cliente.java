@@ -23,11 +23,9 @@ public class Cliente {
     @Column(name = "id_cliente")
     private Long idCliente;
 
-    @Column(name = "nome")
-    private String nome;
-
-    @Column(name = "cpf")
-    private String cpf;
+    @OneToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
 
     @Column(name = "data_de_cadastro")
     private LocalDate dataDeCadastro;
@@ -40,13 +38,12 @@ public class Cliente {
     @OneToMany(mappedBy = "cliente")
     private List<Contato> contatos;
 
-    public Cliente(String nome, String cpf, LocalDate dataDeCadastro) {
-        this.nome = nome;
-        this.cpf = cpf;
-        this.dataDeCadastro = dataDeCadastro;
-    }
-
     public Cliente() {
 
+    }
+
+    public Cliente(Usuario usuario, LocalDate dataDeCadastro) {
+        this.dataDeCadastro = dataDeCadastro;
+        this.usuario = usuario;
     }
 }

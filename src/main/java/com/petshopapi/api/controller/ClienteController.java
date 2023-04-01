@@ -3,12 +3,11 @@ package com.petshopapi.api.controller;
 import com.petshopapi.api.assembler.*;
 import com.petshopapi.api.model.ClienteModel;
 import com.petshopapi.api.model.ContatoModel;
-import com.petshopapi.api.model.EnderecoModel;
 import com.petshopapi.api.model.input.ClienteInput;
 import com.petshopapi.api.model.input.ContatoInput;
 import com.petshopapi.domain.model.Cliente;
-import com.petshopapi.domain.model.Contato;
 import com.petshopapi.domain.model.Endereco;
+import com.petshopapi.domain.model.Usuario;
 import com.petshopapi.domain.service.ClienteService;
 import com.petshopapi.domain.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +55,16 @@ public class ClienteController {
     @PutMapping("/{idCliente}")
     public ClienteModel alterarCliente(@PathVariable Long idCliente, @RequestBody ClienteInput clienteInput) {
         Cliente clienteAtual = clienteService.buscarPorId(idCliente);
-        String cpfAntesDeAtualizar = clienteAtual.getCpf();
+        Usuario usuarioAtual = usuarioService.buscarUsuarioPorId(clienteAtual.getUsuario().getIdUsuario());
 
         clienteInputDisassembler.copyToDomainObjectSkippingProperties(clienteInput, clienteAtual);
         clienteAtual.setIdCliente(idCliente);
 
-        usuarioService.atualizaDadosDeUsuarioAPartirDeCliente(clienteAtual, cpfAntesDeAtualizar);
+        usuarioService.atualizaDadosDeUsuarioAPartirDeClienteInput(clienteInput, usuarioAtual);
+        clienteAtual.setUsuario(usuarioAtual);
 
         if(Objects.isNull(clienteAtual.getEndereco())) {
-            Endereco endereco = enderecoInputDisassembler.toDomainObjectSkippingProperties(clienteInput.getEndereco());
+            Endereco endereco = enderecoInputDisassembler.toDomainObject(clienteInput.getEndereco());
 
             clienteAtual.setEndereco(endereco);
 
@@ -74,30 +74,17 @@ public class ClienteController {
 
         List<ContatoInput> contatoInputs = clienteInput.getContato();
 
-        List<Object> resultadoCadastramento = clienteService.salvarRegistrosEAtualizar(clienteAtual, contatoInputs);
+        Cliente clienteSalvo = clienteService.salvarRegistrosEAtualizar(clienteAtual, contatoInputs);
 
-        return retornaClienteModel(resultadoCadastramento);
+        return retornaClienteModel(clienteSalvo, usuarioAtual);
     }
 
-    private ClienteModel retornaClienteModel(List<Object> resultadoCadastramento) {
-        ClienteModel clienteModel = new ClienteModel();
-        for (Object objeto : resultadoCadastramento) {
-            if(objeto.getClass().equals(Cliente.class)) {
-                clienteModel = clienteModelAssembler.toModel((Cliente) objeto);
-            }
+    private ClienteModel retornaClienteModel(Cliente clienteSalvo, Usuario usuarioAtual) {
+        ClienteModel clienteModel = clienteModelAssembler.toModel(clienteSalvo);
 
-            if (objeto.getClass().equals(Endereco.class)) {
-                EnderecoModel enderecoModel = enderecoModelAssembler.toModel((Endereco) objeto);
+        List<ContatoModel> contatoModels = contatoModelAssembler.toCollectionModel(clienteSalvo.getContatos());
 
-                clienteModel.setEndereco(enderecoModel);
-            }
-
-            if (objeto instanceof List<?>) {
-                List<ContatoModel> contatoModels = contatoModelAssembler.toCollectionModel((List<Contato>) objeto);
-
-                clienteModel.setContato(contatoModels);
-            }
-        }
+        clienteModel.setContato(contatoModels);
 
         return clienteModel;
     }

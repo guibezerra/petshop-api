@@ -7,7 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UsuarioInput {
-    private UsuarioIdInput usuarioIdInput;
+    private String cpf;
+    private String nome;
     private TipoPerfil tipoPerfil;
     private String senha;
 }

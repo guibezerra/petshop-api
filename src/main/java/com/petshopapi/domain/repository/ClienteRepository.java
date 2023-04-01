@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
-    @Query("from Cliente where cpf = :cpf")
+    @Query("from Cliente c join Usuario u on u.idUsuario = c.usuario.idUsuario where u.cpf = :cpf")
     Optional<Cliente> findByCpf(@Param("cpf") String cpf);
 }

@@ -17,7 +17,6 @@ public class Contato {
     @Column(name = "id_contato")
     private Long idContato;
 
-
     @ManyToOne
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;

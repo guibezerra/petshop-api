@@ -8,7 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ContatoInput {
-//    private ClienteIdInput idCliente;
     private TagContato tagContato;
     private TipoContato tipoContato;
     private String valor;

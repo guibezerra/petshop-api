@@ -1,5 +1,6 @@
 package com.petshopapi.domain.service;
 
+import com.petshopapi.api.model.input.ClienteInput;
 import com.petshopapi.domain.model.*;
 import com.petshopapi.domain.repository.ClienteRepository;
 import com.petshopapi.domain.repository.ContatoRepository;
@@ -40,8 +41,20 @@ public class UsuarioService {
 
     @Transactional
     public Usuario buscarUsuarioPorCpf(String cpf) {
-        return usuarioRepository.findByCpf(cpf)
+        Usuario usuario = usuarioRepository.findByCpf(cpf)
                 .orElseThrow(() -> new RuntimeException());
+
+        verificaSeUsuarioEClienteEBusca(usuario);
+
+        return usuario;
+    }
+
+    private void verificaSeUsuarioEClienteEBusca(Usuario usuario) {
+        if (usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE)) {
+            Cliente cliente = clienteService.buscarPorCpf(usuario.getCpf());
+
+            usuario.setCliente(cliente);
+        }
     }
 
     @Transactional
@@ -52,65 +65,60 @@ public class UsuarioService {
 
     @Transactional
     public Page<Usuario> buscarTodosOsUsuarios(Pageable pageable) {
-
         return usuarioRepository.findAll(pageable);
     }
 
     @Transactional
-    public List<Object> salvarUsuario(Usuario usuario) {
+    public Usuario salvarUsuario(Usuario usuario) {
         List<Object> resultadoDoCadastro = new ArrayList<>();
-
-        verificaSeUsuarioEClienteESalva(usuario, resultadoDoCadastro);
 
         usuario = usuarioRepository.save(usuario);
 
         resultadoDoCadastro.add(usuario);
 
-        return resultadoDoCadastro;
+        verificaSeUsuarioEClienteESalva(usuario, resultadoDoCadastro);
+
+        return usuario;
     }
 
     private void verificaSeUsuarioEClienteESalva(Usuario usuario, List<Object> resultadoDoCadastro) {
         if(usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE)) {
-            Cliente cliente = new Cliente(usuario.getNome(), usuario.getCpf(), LocalDate.now());
+            Cliente cliente = new Cliente(usuario, LocalDate.now());
+
             cliente = clienteRepository.save(cliente);
+
+            usuario.setCliente(cliente);
 
             resultadoDoCadastro.add(cliente);
         }
     }
 
     @Transactional
-    public Usuario alterarUsuario(Usuario usuarioAtual, String cpfAntigo) {
+    public Usuario alterarUsuario(Usuario usuarioAtual) {
         entityManager.detach(usuarioAtual);
 
-        verificaSeUsuarioEClienteEAtualizaDados(usuarioAtual, cpfAntigo);
-
-        usuarioRepository.updateUsuario(usuarioAtual.getCpf(), usuarioAtual.getNome(), usuarioAtual.getSenha(), usuarioAtual.getIdUsuario());
+        usuarioRepository.save(usuarioAtual);
 
         return usuarioAtual;
-    }
-
-    private void verificaSeUsuarioEClienteEAtualizaDados(Usuario usuarioAtual, String cpfAntigo) {
-        Cliente cliente = clienteService.buscarPorCpf(cpfAntigo);
-
-        if(!Objects.isNull(cliente)) {
-            cliente.setNome(usuarioAtual.getNome());
-            cliente.setCpf(usuarioAtual.getCpf());
-
-            clienteRepository.save(cliente);
-        }
     }
 
     @Transactional
     public void excluirUsuario(String cpf) {
         verificaSeUsuarioEClienteEDeletaRegistros(cpf);
 
-        usuarioRepository.deleteByCpf(cpf);
+        Usuario usuario = usuarioRepository.findByCpf(cpf).orElseThrow(() -> new RuntimeException());
+
+        entityManager.detach(usuario);
+
+        usuarioRepository.delete(usuario);
     }
 
     private void verificaSeUsuarioEClienteEDeletaRegistros(String cpf) {
         Cliente cliente = clienteService.buscarPorCpf(cpf);
 
-        if(!Objects.isNull(cliente)) {
+        entityManager.detach(cliente);
+
+        if(Objects.nonNull(cliente)) {
             if ( existsEnderecoParaCliente(cliente.getIdCliente()) ){
                 Endereco endereco =  enderecoRepository.findByIdCliente(cliente.getIdCliente()).get();
 
@@ -136,17 +144,12 @@ public class UsuarioService {
     }
 
     @Transactional
-    public void atualizaDadosDeUsuarioAPartirDeCliente(Cliente clienteAtual, String cpfAntigo) {
-        Usuario usuarioAtual = usuarioRepository.findByCpf(cpfAntigo).get();
-        Long idUsuario = usuarioAtual.getIdUsuario();
-
+    public void atualizaDadosDeUsuarioAPartirDeClienteInput(ClienteInput clienteInput, Usuario usuarioAtual) {
         entityManager.detach(usuarioAtual);
 
-        usuarioAtual.setIdUsuario(idUsuario);
-        usuarioAtual.setNome(clienteAtual.getNome());
-        usuarioAtual.setCpf(clienteAtual.getCpf());
+        usuarioAtual.setNome(clienteInput.getNome());
+        usuarioAtual.setCpf(clienteInput.getCpf());
 
-        usuarioRepository.updateUsuario(usuarioAtual.getCpf(), usuarioAtual.getNome(),
-                usuarioAtual.getSenha(), usuarioAtual.getIdUsuario());
+        usuarioRepository.save(usuarioAtual);
     }
 }

@@ -12,31 +12,23 @@ DROP TABLE IF EXISTS cliente;
 
 DROP TABLE IF EXISTS usuario;
 
-DROP SEQUENCE IF EXISTS usuario_id_seq;
-
-DROP SEQUENCE IF EXISTS cliente_id_seq;
-
-CREATE SEQUENCE usuario_id_seq START 1;
-
 CREATE TABLE usuario (
+    id_usuario BIGSERIAL NOT NULL,
     cpf varchar(14) NOT NULL,
     nome varchar(50) NOT NULL,
-    id_usuario integer DEFAULT nextval('usuario_id_seq'),
     perfil varchar(7) NOT NULL,
     senha varchar(8) NOT NULL,
 
-    PRIMARY KEY (id_usuario, cpf, nome)
+    PRIMARY KEY (id_usuario)
 );
 
-CREATE SEQUENCE cliente_id_seq;
-
 CREATE TABLE cliente(
-    id_cliente integer DEFAULT nextval('cliente_id_seq'),
-    nome varchar(50) NOT NULL,
-    cpf varchar(14) NOT NULL,
+    id_cliente BIGSERIAL NOT NULL,
+    id_usuario BIGSERIAL NOT NULL,
     data_de_cadastro date NOT NULL,
 
-    PRIMARY KEY (id_cliente)
+    PRIMARY KEY (id_cliente),
+    FOREIGN KEY (id_usuario) REFERENCES usuario
 );
 
 CREATE TABLE endereco(

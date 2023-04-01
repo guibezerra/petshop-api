@@ -3,7 +3,11 @@ package com.petshopapi.api.assembler;
 
 import com.petshopapi.api.assembler.generic.ObjectInputDisassembler;
 import com.petshopapi.api.model.input.ClienteInput;
+import com.petshopapi.api.model.input.ContatoInput;
 import com.petshopapi.domain.model.Cliente;
+import com.petshopapi.domain.model.Contato;
+import com.petshopapi.domain.model.Usuario;
+import org.modelmapper.Converter;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeMap;
 import org.modelmapper.convention.MatchingStrategies;
@@ -32,18 +36,12 @@ public class ClienteInputDisassembler extends ObjectInputDisassembler<ClienteInp
     }
 
     public void copyToDomainObjectSkippingProperties(ClienteInput clienteInput, Cliente cliente) {
-        modelMapper.getConfiguration().setAmbiguityIgnored(true);
-
         TypeMap<ClienteInput, Cliente> typeMap = modelMapper.getTypeMap(ClienteInput.class, Cliente.class);
         if(Objects.isNull(typeMap)) {
-            modelMapper.addMappings(new PropertyMap<ClienteInput, Cliente>() {
-                @Override
-                protected void configure() {
-                    map().getEndereco().setIdEndereco(null);
-                }
-            });
+            modelMapper.createTypeMap(ClienteInput.class, Cliente.class)
+                    .addMapping(src -> src.getEndereco().getLogradouro(),(dest, value) -> dest.getEndereco().setLogradouro((String) value));
+
         }
 
-        modelMapper.map(clienteInput, cliente);
     }
 }

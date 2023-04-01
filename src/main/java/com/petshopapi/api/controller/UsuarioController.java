@@ -1,13 +1,10 @@
 package com.petshopapi.api.controller;
 
 
-import com.petshopapi.api.assembler.ClienteModelAssembler;
 import com.petshopapi.api.assembler.UsuarioInputDisassembler;
 import com.petshopapi.api.assembler.UsuarioModelAssembler;
-import com.petshopapi.api.model.ClienteModel;
 import com.petshopapi.api.model.UsuarioModel;
 import com.petshopapi.api.model.input.UsuarioInput;
-import com.petshopapi.domain.model.Cliente;
 import com.petshopapi.domain.model.Usuario;
 import com.petshopapi.domain.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +15,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(value="/usuario")
 public class UsuarioController {
@@ -28,9 +23,6 @@ public class UsuarioController {
 
     @Autowired
     UsuarioModelAssembler usuarioModelAssembler;
-
-    @Autowired
-    private ClienteModelAssembler clienteModelAssembler;
 
     @Autowired
     UsuarioService usuarioService;
@@ -62,40 +54,20 @@ public class UsuarioController {
     public UsuarioModel cadastrarUsuario(@RequestBody UsuarioInput usuarioInput) {
         Usuario usuario = usuarioInputDisassembler.toDomainObjectSkippingProperties(usuarioInput);
 
-        List<Object> resultadoDoCadastramento = usuarioService.salvarUsuario(usuario);
+        usuario = usuarioService.salvarUsuario(usuario);
 
-        UsuarioModel usuarioModel = converteResultadoDoCadastramentoERetornaUsuarioModel(resultadoDoCadastramento);
-
-        return usuarioModel;
-    }
-
-    private UsuarioModel converteResultadoDoCadastramentoERetornaUsuarioModel(List<Object> resultadoDoCadastramento) {
-        UsuarioModel usuarioModel = new UsuarioModel();
-
-        for (Object objeto : resultadoDoCadastramento) {
-            if (objeto.getClass().equals(Cliente.class)) {
-                ClienteModel clienteModel = clienteModelAssembler.toModel((Cliente) objeto);
-
-                usuarioModel.setClienteModel(clienteModel);
-
-            } else if(objeto.getClass().equals(Usuario.class)) {
-                usuarioModel = usuarioModelAssembler.toModel((Usuario) objeto);
-            }
-        }
-
-        return usuarioModel;
+        return usuarioModelAssembler.toModel(usuario);
     }
 
     @PutMapping("/{idUsuario}")
     public UsuarioModel alterarUsuario(@PathVariable Long idUsuario, @RequestBody UsuarioInput usuarioInput) {
         Usuario usuarioAtual = usuarioService.buscarUsuarioPorId(idUsuario);
-        String cpfAntigo = usuarioAtual.getCpf();
 
         usuarioInputDisassembler.copyToDomainObjectSkippingProperties(usuarioInput, usuarioAtual);
 
         usuarioAtual.setIdUsuario(idUsuario);
 
-        usuarioAtual = usuarioService.alterarUsuario(usuarioAtual, cpfAntigo);
+        usuarioAtual = usuarioService.alterarUsuario(usuarioAtual);
 
         return usuarioModelAssembler.toModel(usuarioAtual);
     }
@@ -103,7 +75,6 @@ public class UsuarioController {
     @DeleteMapping("/{cpf}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletarUsuarioPorCpf(@PathVariable String cpf) {
-
         usuarioService.excluirUsuario(cpf);
     }
 }

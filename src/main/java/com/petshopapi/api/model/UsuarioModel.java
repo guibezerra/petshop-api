@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UsuarioModel {
+    private Long idUsuario;
     private String cpf;
     private String nome;
-    private Long idUsuario;
     private TipoPerfil tipoPerfil;
-    private ClienteModel clienteModel;
+    private ClienteModel cliente;
 }
