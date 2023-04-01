@@ -25,16 +25,15 @@ public class UsuarioService {
     UsuarioRepository usuarioRepository;
 
     @Autowired
-    ClienteRepository clienteRepository;
+    private EnderecoRepository enderecoRepository;
 
     @Autowired
-    EnderecoRepository enderecoRepository;
-
-    @Autowired
-    ContatoRepository contatoRepository;
+    private ContatoRepository contatoRepository;
 
     @Autowired
     private ClienteService clienteService;
+
+    @Autowired PetService petService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -85,7 +84,7 @@ public class UsuarioService {
         if(usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE)) {
             Cliente cliente = new Cliente(usuario, LocalDate.now());
 
-            cliente = clienteRepository.save(cliente);
+            cliente = clienteService.salvar(cliente);
 
             usuario.setCliente(cliente);
 
@@ -119,29 +118,28 @@ public class UsuarioService {
         entityManager.detach(cliente);
 
         if(Objects.nonNull(cliente)) {
-            if ( existsEnderecoParaCliente(cliente.getIdCliente()) ){
+            if ( clienteService.existsEnderecoParaCliente(cliente.getIdCliente()) ){
                 Endereco endereco =  enderecoRepository.findByIdCliente(cliente.getIdCliente()).get();
 
                 enderecoRepository.delete(endereco);
             }
 
-            if ( existsContatosParaCliente(cliente.getIdCliente()) ) {
+            if ( clienteService.existsContatosParaCliente(cliente.getIdCliente()) ) {
                 List<Contato> contatos = contatoRepository.findByIdCliente(cliente.getIdCliente());
 
                 contatoRepository.deleteAll(contatos);
             }
 
-            clienteRepository.delete(cliente);
+            if( petService.existsPetParaCliente(cliente.getIdCliente()) ) {
+                List<Pet> pet = petService.buscarPorIdCliente(cliente.getIdCliente());
+
+                petService.deletarTodos(pet);
+            }
+
+            clienteService.deletarCliente(cliente);
         }
     }
 
-    private boolean existsEnderecoParaCliente(Long idCliente) {
-        return enderecoRepository.existsByIdCliente(idCliente);
-    }
-
-    private boolean existsContatosParaCliente(Long idCliente) {
-        return contatoRepository.existsByIdCliente(idCliente);
-    }
 
     @Transactional
     public void atualizaDadosDeUsuarioAPartirDeClienteInput(ClienteInput clienteInput, Usuario usuarioAtual) {
