@@ -29,9 +29,6 @@ public class ClienteController {
     private ClienteModelAssembler clienteModelAssembler;
 
     @Autowired
-    private ContatoInputDisassembler contatoInputDisassembler;
-
-    @Autowired
     private ContatoModelAssembler contatoModelAssembler;
 
     @Autowired

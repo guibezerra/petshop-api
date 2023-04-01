@@ -49,6 +49,11 @@ public class ClienteService {
     }
 
     @Transactional
+    public Cliente salvar(Cliente cliente) {
+        return clienteRepository.save(cliente);
+    }
+
+    @Transactional
     public Cliente salvarRegistrosEAtualizar(Cliente clienteAtual, List<ContatoInput> contatoInputs) {
         validaEAtualizaContatosAtuaisComContatosInput(clienteAtual, contatoInputs);
         preparaESalvaContatos(clienteAtual, clienteAtual.getContatos());
@@ -131,5 +136,17 @@ public class ClienteService {
         endereco = enderecoRepository.save(endereco);
 
         clienteSalvo.setEndereco(endereco);
+    }
+
+    public boolean existsEnderecoParaCliente(Long idCliente) {
+        return enderecoRepository.existsByIdCliente(idCliente);
+    }
+
+    public boolean existsContatosParaCliente(Long idCliente) {
+        return contatoRepository.existsByIdCliente(idCliente);
+    }
+
+    public void deletarCliente(Cliente cliente) {
+        clienteRepository.delete(cliente);
     }
 }
