@@ -2,6 +2,7 @@ package com.petshopapi.domain.service;
 
 import com.petshopapi.api.assembler.ContatoInputDisassembler;
 import com.petshopapi.api.model.input.ContatoInput;
+import com.petshopapi.domain.exception.EntidadeNaoEncontradaException;
 import com.petshopapi.domain.model.*;
 import com.petshopapi.domain.repository.ClienteRepository;
 import com.petshopapi.domain.repository.ContatoRepository;
@@ -29,7 +30,9 @@ public class ClienteService {
     @Autowired
     private ContatoInputDisassembler contatoInputDisassembler;
 
-    final int QUANTIDADE_MAXIMA_DE_CONTATOS_PERMITIDA_NUMA_LISTA = 2;
+    private final int QUANTIDADE_MAXIMA_DE_CONTATOS_PERMITIDA_NUMA_LISTA = 2;
+
+    private final String MSG_CLIENTE_NAO_ENCONTRADO_POR_CPF = "Não existe registros de usuario para o CPF informado.";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -37,7 +40,7 @@ public class ClienteService {
     @Transactional(readOnly = true)
     public Cliente buscarPorCpf(String cpf) {
        Cliente cliente =  clienteRepository.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(MSG_CLIENTE_NAO_ENCONTRADO_POR_CPF));
 
         return cliente;
     }

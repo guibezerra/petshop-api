@@ -1,6 +1,8 @@
 package com.petshopapi.domain.service;
 
 import com.petshopapi.api.model.input.ClienteInput;
+import com.petshopapi.domain.exception.EntidadeNaoEncontradaException;
+import com.petshopapi.domain.exception.NegocioException;
 import com.petshopapi.domain.model.*;
 import com.petshopapi.domain.repository.ContatoRepository;
 import com.petshopapi.domain.repository.EnderecoRepository;
@@ -40,10 +42,14 @@ public class UsuarioService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    private final String MSG_USUARIO_NAO_ENCONTRADO_POR_CPF = "Não existe registros de usuario para o CPF informado.";
+    private final String MSG_USUARIO_NAO_ENCONTRADO_POR_ID = "Não existe registros de usuario para o id informado.";
+    private final String MSG_CPF_JA_EXISTENTE = "Já existe registro de usuário com o CPF informado. Por Favor, insira um novo CPF.";
+
     @Transactional
     public Usuario buscarUsuarioPorCpf(String cpf) {
         Usuario usuario = usuarioRepository.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(MSG_USUARIO_NAO_ENCONTRADO_POR_CPF));
 
         verificaSeUsuarioEClienteEBusca(usuario);
 
@@ -61,7 +67,7 @@ public class UsuarioService {
     @Transactional
     public Usuario buscarUsuarioPorId(Long idUsuario) {
         return usuarioRepository.findByIdUsuario(idUsuario)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(MSG_USUARIO_NAO_ENCONTRADO_POR_ID));
     }
 
     @Transactional
@@ -71,32 +77,40 @@ public class UsuarioService {
 
     @Transactional
     public Usuario salvarUsuario(Usuario usuario) {
-        List<Object> resultadoDoCadastro = new ArrayList<>();
+        verificaSeCPFjaExiste(usuario);
 
         usuario = usuarioRepository.save(usuario);
 
-        resultadoDoCadastro.add(usuario);
-
-        verificaSeUsuarioEClienteESalva(usuario, resultadoDoCadastro);
+        verificaSeUsuarioEClienteESalva(usuario);
 
         return usuario;
     }
 
-    private void verificaSeUsuarioEClienteESalva(Usuario usuario, List<Object> resultadoDoCadastro) {
+    private void verificaSeCPFjaExiste(Usuario usuario) {
+        if(usuarioRepository.existsByCpfETipo(usuario.getCpf())) {
+            Usuario usuarioResultado = usuarioRepository.findByCpf(usuario.getCpf()).get();
+
+            if(usuarioResultado.getIdUsuario() != usuario.getIdUsuario()) {
+                throw new NegocioException(MSG_CPF_JA_EXISTENTE);
+            }
+        }
+    }
+
+    private void verificaSeUsuarioEClienteESalva(Usuario usuario) {
         if(usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE)) {
             Cliente cliente = new Cliente(usuario, LocalDate.now());
 
             cliente = clienteService.salvar(cliente);
 
             usuario.setCliente(cliente);
-
-            resultadoDoCadastro.add(cliente);
         }
     }
 
     @Transactional
     public Usuario alterarUsuario(Usuario usuarioAtual) {
         entityManager.detach(usuarioAtual);
+
+        verificaSeCPFjaExiste(usuarioAtual);
 
         usuarioRepository.save(usuarioAtual);
 
@@ -105,7 +119,14 @@ public class UsuarioService {
 
     @Transactional
     public void excluirUsuario(String cpf) {
+<<<<<<< HEAD
         Usuario usuario = usuarioRepository.findByCpf(cpf).orElseThrow(() -> new RuntimeException());
+=======
+        verificaSeUsuarioEClienteEDeletaRegistros(cpf);
+
+        Usuario usuario = buscarUsuarioPorCpf(cpf);
+
+>>>>>>> d4d9440 (criação de classe para tratar exceções e implementação de validações)
         entityManager.detach(usuario);
 
         verificaSeUsuarioEClienteEDeletaRegistros(usuario);
@@ -113,10 +134,19 @@ public class UsuarioService {
         usuarioRepository.delete(usuario);
     }
 
+<<<<<<< HEAD
     private void verificaSeUsuarioEClienteEDeletaRegistros(Usuario usuario) {
         if( usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE) ) {
             Cliente cliente = clienteService.buscarPorCpf(usuario.getCpf());
 
+=======
+    private void verificaSeUsuarioEClienteEDeletaRegistros(String cpf) {
+        Usuario usuario = buscarUsuarioPorCpf(cpf);
+
+        if(usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE)) {
+            Cliente cliente = clienteService.buscarPorCpf(cpf);
+
+>>>>>>> d4d9440 (criação de classe para tratar exceções e implementação de validações)
             entityManager.detach(cliente);
 
             if ( clienteService.existsEnderecoParaCliente(cliente.getIdCliente()) ){
@@ -148,13 +178,14 @@ public class UsuarioService {
         }
     }
 
-
     @Transactional
     public void atualizaDadosDeUsuarioAPartirDeClienteInput(ClienteInput clienteInput, Usuario usuarioAtual) {
         entityManager.detach(usuarioAtual);
 
         usuarioAtual.setNome(clienteInput.getNome());
         usuarioAtual.setCpf(clienteInput.getCpf());
+
+        verificaSeCPFjaExiste(usuarioAtual);
 
         usuarioRepository.save(usuarioAtual);
     }

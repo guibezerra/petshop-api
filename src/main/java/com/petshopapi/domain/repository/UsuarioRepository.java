@@ -18,6 +18,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
     Optional<Usuario> findByIdUsuario(@Param("idUsuario") Long idUsuario);
 
     @Query("select case when (count(idUsuario) > 0) then true else false end from Usuario " +
-            "where cpf = :cpf and tipoPerfil = :tipoPerfil")
-    boolean existsByCpfETipo(@Param("cpf") String cpf, @Param("tipoPerfil") TipoPerfil tipoPerfil);
+            "where cpf = :cpf")
+    boolean existsByCpfETipo(@Param("cpf") String cpf);
 }
