@@ -2,12 +2,12 @@ package com.petshopapi.domain.service;
 
 import com.petshopapi.api.model.input.ClienteInput;
 import com.petshopapi.domain.model.*;
-import com.petshopapi.domain.repository.ClienteRepository;
 import com.petshopapi.domain.repository.ContatoRepository;
 import com.petshopapi.domain.repository.EnderecoRepository;
 import com.petshopapi.domain.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,6 @@ import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class UsuarioService {
@@ -34,6 +33,9 @@ public class UsuarioService {
     private ClienteService clienteService;
 
     @Autowired PetService petService;
+
+    @Autowired
+    AtendimetoService atendimetoService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -103,21 +105,20 @@ public class UsuarioService {
 
     @Transactional
     public void excluirUsuario(String cpf) {
-        verificaSeUsuarioEClienteEDeletaRegistros(cpf);
-
         Usuario usuario = usuarioRepository.findByCpf(cpf).orElseThrow(() -> new RuntimeException());
-
         entityManager.detach(usuario);
+
+        verificaSeUsuarioEClienteEDeletaRegistros(usuario);
 
         usuarioRepository.delete(usuario);
     }
 
-    private void verificaSeUsuarioEClienteEDeletaRegistros(String cpf) {
-        Cliente cliente = clienteService.buscarPorCpf(cpf);
+    private void verificaSeUsuarioEClienteEDeletaRegistros(Usuario usuario) {
+        if( usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE) ) {
+            Cliente cliente = clienteService.buscarPorCpf(usuario.getCpf());
 
-        entityManager.detach(cliente);
+            entityManager.detach(cliente);
 
-        if(Objects.nonNull(cliente)) {
             if ( clienteService.existsEnderecoParaCliente(cliente.getIdCliente()) ){
                 Endereco endereco =  enderecoRepository.findByIdCliente(cliente.getIdCliente()).get();
 
@@ -128,6 +129,13 @@ public class UsuarioService {
                 List<Contato> contatos = contatoRepository.findByIdCliente(cliente.getIdCliente());
 
                 contatoRepository.deleteAll(contatos);
+            }
+
+            if( atendimetoService.existisAtendimentoParaCliente(cliente.getIdCliente()) ) {
+                Pageable pageable = null;
+                List<Atendimento> atendimentoList = atendimetoService.buscarTodosParaCliente(cliente.getIdCliente(), pageable).toList();
+
+                atendimetoService.deletarTodos(atendimentoList);
             }
 
             if( petService.existsPetParaCliente(cliente.getIdCliente()) ) {
