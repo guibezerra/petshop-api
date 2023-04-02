@@ -1,6 +1,5 @@
 package com.petshopapi.domain.repository;
 
-import com.petshopapi.domain.model.TipoPerfil;
 import com.petshopapi.domain.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

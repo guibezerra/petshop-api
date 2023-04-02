@@ -119,14 +119,8 @@ public class UsuarioService {
 
     @Transactional
     public void excluirUsuario(String cpf) {
-<<<<<<< HEAD
-        Usuario usuario = usuarioRepository.findByCpf(cpf).orElseThrow(() -> new RuntimeException());
-=======
-        verificaSeUsuarioEClienteEDeletaRegistros(cpf);
-
         Usuario usuario = buscarUsuarioPorCpf(cpf);
 
->>>>>>> d4d9440 (criação de classe para tratar exceções e implementação de validações)
         entityManager.detach(usuario);
 
         verificaSeUsuarioEClienteEDeletaRegistros(usuario);
@@ -134,19 +128,10 @@ public class UsuarioService {
         usuarioRepository.delete(usuario);
     }
 
-<<<<<<< HEAD
     private void verificaSeUsuarioEClienteEDeletaRegistros(Usuario usuario) {
         if( usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE) ) {
             Cliente cliente = clienteService.buscarPorCpf(usuario.getCpf());
 
-=======
-    private void verificaSeUsuarioEClienteEDeletaRegistros(String cpf) {
-        Usuario usuario = buscarUsuarioPorCpf(cpf);
-
-        if(usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE)) {
-            Cliente cliente = clienteService.buscarPorCpf(cpf);
-
->>>>>>> d4d9440 (criação de classe para tratar exceções e implementação de validações)
             entityManager.detach(cliente);
 
             if ( clienteService.existsEnderecoParaCliente(cliente.getIdCliente()) ){

@@ -62,7 +62,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{idUsuario}")
-    public UsuarioModel alterarUsuario(@PathVariable Long idUsuario, @RequestBody UsuarioInput usuarioInput) {
+    public UsuarioModel alterarUsuario(@PathVariable Long idUsuario, @Valid @RequestBody UsuarioInput usuarioInput) {
         Usuario usuarioAtual = usuarioService.buscarUsuarioPorId(idUsuario);
 
         usuarioInputDisassembler.copyToDomainObjectSkippingProperties(usuarioInput, usuarioAtual);

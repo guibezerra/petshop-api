@@ -1,5 +1,6 @@
 package com.petshopapi.domain.service;
 
+import com.petshopapi.domain.exception.EntidadeNaoEncontradaException;
 import com.petshopapi.domain.model.Cliente;
 import com.petshopapi.domain.model.Pet;
 import com.petshopapi.domain.model.Raca;
@@ -23,6 +24,8 @@ public class PetService {
     @Autowired
     ClienteService clienteService;
 
+    private final String MSG_PET_NAO_ENCONTRADO = "Não foi encontrado registro de Pet com o id informado. Por favor, tente novamente.";
+
     @Transactional
     public Page<Pet> buscarTodos(Long idCliente, Pageable pageable) {
         return petRepository.findAllByCliente(idCliente, pageable);
@@ -31,7 +34,7 @@ public class PetService {
     @Transactional
     public Pet buscarPorId(Long idPet) {
         return petRepository.findById(idPet)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(MSG_PET_NAO_ENCONTRADO));
     }
 
     @Transactional

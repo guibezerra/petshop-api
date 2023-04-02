@@ -14,6 +14,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("atendimento")
 public class AtendimentoController {
@@ -51,7 +53,7 @@ public class AtendimentoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AtendimentoModel salvarAtendimento(@RequestBody AtendimentoInput atendimentoInput) {
+    public AtendimentoModel salvarAtendimento(@Valid @RequestBody AtendimentoInput atendimentoInput) {
         Atendimento atendimento = atendimentoInputDisassembler.toDomainObject(atendimentoInput);
 
         atendimento = atendimetoService.salvarAtentimento(atendimento);
@@ -60,7 +62,7 @@ public class AtendimentoController {
     }
 
     @PutMapping("/{idAtendimento}")
-    public AtendimentoModel alterarAtendimento(@RequestBody AtendimentoInput atendimentoInput, @PathVariable Long idAtendimento) {
+    public AtendimentoModel alterarAtendimento(@Valid @RequestBody AtendimentoInput atendimentoInput, @PathVariable Long idAtendimento) {
         Atendimento atendimento = atendimetoService.buscarPorId(idAtendimento);
 
         atendimentoInputDisassembler.copyToDomainObject(atendimentoInput, atendimento);

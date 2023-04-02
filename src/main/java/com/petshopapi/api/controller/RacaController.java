@@ -14,6 +14,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/raca")
 public class RacaController {
@@ -49,7 +51,7 @@ public class RacaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RacaModel cadastrarRaca(@RequestBody RacaInput racaInput) {
+    public RacaModel cadastrarRaca(@RequestBody @Valid RacaInput racaInput) {
         Raca raca = racaInputDisassembler.toDomainObject(racaInput);
 
         raca = racaService.salvar(raca);
@@ -58,7 +60,7 @@ public class RacaController {
     }
 
     @PutMapping("/{idRaca}")
-    public RacaModel atualizarRaca(@PathVariable Long idRaca, @RequestBody RacaInput racaInput) {
+    public RacaModel atualizarRaca(@PathVariable Long idRaca, @Valid @RequestBody RacaInput racaInput) {
         Raca raca = racaService.buscarPorId(idRaca);
 
         racaInputDisassembler.copyToDomainObject(racaInput, raca);

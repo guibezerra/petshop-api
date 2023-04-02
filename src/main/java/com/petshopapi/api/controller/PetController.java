@@ -14,6 +14,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/pet")
 public class PetController {
@@ -50,7 +52,7 @@ public class PetController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PetModel cadastrarPet(@RequestBody PetInput petInput) {
+    public PetModel cadastrarPet(@RequestBody @Valid PetInput petInput) {
         Pet pet = petInputDisassembler.toDomainObject(petInput);
 
         pet = petService.salvar(pet);
@@ -59,7 +61,7 @@ public class PetController {
     }
 
     @PutMapping("/{idPet}")
-    public PetModel atualizarPet(@PathVariable Long idPet, @RequestBody PetInput petInput) {
+    public PetModel atualizarPet(@PathVariable Long idPet,@Valid @RequestBody PetInput petInput) {
         Pet petAtual = petService.buscarPorId(idPet);
 
         petInputDisassembler.copyToDomainObject(petInput, petAtual);
