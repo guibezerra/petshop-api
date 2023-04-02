@@ -13,6 +13,7 @@ import com.petshopapi.domain.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,7 +51,7 @@ public class ClienteController {
     }
 
     @PutMapping("/{idCliente}")
-    public ClienteModel alterarCliente(@PathVariable Long idCliente, @RequestBody ClienteInput clienteInput) {
+    public ClienteModel alterarCliente(@PathVariable Long idCliente, @Valid @RequestBody ClienteInput clienteInput) {
         Cliente clienteAtual = clienteService.buscarPorId(idCliente);
         Usuario usuarioAtual = usuarioService.buscarUsuarioPorId(clienteAtual.getUsuario().getIdUsuario());
 
@@ -73,10 +74,10 @@ public class ClienteController {
 
         Cliente clienteSalvo = clienteService.salvarRegistrosEAtualizar(clienteAtual, contatoInputs);
 
-        return retornaClienteModel(clienteSalvo, usuarioAtual);
+        return retornaClienteModel(clienteSalvo);
     }
 
-    private ClienteModel retornaClienteModel(Cliente clienteSalvo, Usuario usuarioAtual) {
+    private ClienteModel retornaClienteModel(Cliente clienteSalvo) {
         ClienteModel clienteModel = clienteModelAssembler.toModel(clienteSalvo);
 
         List<ContatoModel> contatoModels = contatoModelAssembler.toCollectionModel(clienteSalvo.getContatos());

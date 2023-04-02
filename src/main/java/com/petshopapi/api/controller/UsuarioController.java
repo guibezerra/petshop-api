@@ -15,6 +15,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value="/usuario")
 public class UsuarioController {
@@ -51,7 +53,7 @@ public class UsuarioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UsuarioModel cadastrarUsuario(@RequestBody UsuarioInput usuarioInput) {
+    public UsuarioModel cadastrarUsuario(@Valid @RequestBody UsuarioInput usuarioInput) {
         Usuario usuario = usuarioInputDisassembler.toDomainObjectSkippingProperties(usuarioInput);
 
         usuario = usuarioService.salvarUsuario(usuario);
@@ -60,7 +62,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{idUsuario}")
-    public UsuarioModel alterarUsuario(@PathVariable Long idUsuario, @RequestBody UsuarioInput usuarioInput) {
+    public UsuarioModel alterarUsuario(@PathVariable Long idUsuario, @Valid @RequestBody UsuarioInput usuarioInput) {
         Usuario usuarioAtual = usuarioService.buscarUsuarioPorId(idUsuario);
 
         usuarioInputDisassembler.copyToDomainObjectSkippingProperties(usuarioInput, usuarioAtual);

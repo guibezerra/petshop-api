@@ -2,6 +2,8 @@ package com.petshopapi.domain.service;
 
 import com.petshopapi.api.assembler.ContatoInputDisassembler;
 import com.petshopapi.api.model.input.ContatoInput;
+import com.petshopapi.domain.exception.EntidadeNaoEncontradaException;
+import com.petshopapi.domain.exception.NegocioException;
 import com.petshopapi.domain.model.*;
 import com.petshopapi.domain.repository.ClienteRepository;
 import com.petshopapi.domain.repository.ContatoRepository;
@@ -29,15 +31,16 @@ public class ClienteService {
     @Autowired
     private ContatoInputDisassembler contatoInputDisassembler;
 
-    final int QUANTIDADE_MAXIMA_DE_CONTATOS_PERMITIDA_NUMA_LISTA = 2;
+    private final int QUANTIDADE_MAXIMA_DE_CONTATOS_PERMITIDA_NUMA_LISTA = 2;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final String MSG_CLIENTE_NAO_ENCONTRADO_POR_CPF = "Não existe registros de cliente para o CPF informado. Por favor, tente novamente";
+    private final String MSG_CLIENTE_NAO_ENCONTRADO_POR_ID = "Não existe registros de cliente para o id informado. Por favor, tente novamente";
+    private final String MSG_QUANT_MAX_DE_CONTATOS_EXCEDIDA = "É permitido salvar somente 2 contatos para cada cliente. Por favor, informe dois contatos e tente novamaente.";
 
     @Transactional(readOnly = true)
     public Cliente buscarPorCpf(String cpf) {
        Cliente cliente =  clienteRepository.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(MSG_CLIENTE_NAO_ENCONTRADO_POR_CPF));
 
         return cliente;
     }
@@ -45,7 +48,7 @@ public class ClienteService {
     @Transactional
     public Cliente buscarPorId(Long idCliente) {
         return clienteRepository.findById(idCliente)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new EntidadeNaoEncontradaException(MSG_CLIENTE_NAO_ENCONTRADO_POR_ID));
     }
 
     @Transactional
@@ -64,7 +67,7 @@ public class ClienteService {
 
     private void validaEAtualizaContatosAtuaisComContatosInput(Cliente cliente, List<ContatoInput> contatosInput) {
         if(contatosInput.size() > QUANTIDADE_MAXIMA_DE_CONTATOS_PERMITIDA_NUMA_LISTA) {
-            throw new RuntimeException();
+            throw new NegocioException(MSG_QUANT_MAX_DE_CONTATOS_EXCEDIDA);
         }
 
         List<Contato> contatosAtuais = new ArrayList<>();
