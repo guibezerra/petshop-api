@@ -9,7 +9,6 @@ import com.petshopapi.domain.repository.EnderecoRepository;
 import com.petshopapi.domain.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -57,7 +55,7 @@ public class UsuarioService {
     }
 
     private void verificaSeUsuarioEClienteEBusca(Usuario usuario) {
-        if (usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE)) {
+        if (usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE.getValor())) {
             Cliente cliente = clienteService.buscarPorCpf(usuario.getCpf());
 
             usuario.setCliente(cliente);
@@ -79,6 +77,13 @@ public class UsuarioService {
     public Usuario salvarUsuario(Usuario usuario) {
         verificaSeCPFjaExiste(usuario);
 
+        if(usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE.toString())) {
+            usuario.setTipoPerfil(TipoPerfil.CLIENTE.getValor());
+
+        } else {
+            usuario.setTipoPerfil(TipoPerfil.ADMIN.getValor());
+        }
+
         usuario = usuarioRepository.save(usuario);
 
         verificaSeUsuarioEClienteESalva(usuario);
@@ -97,7 +102,7 @@ public class UsuarioService {
     }
 
     private void verificaSeUsuarioEClienteESalva(Usuario usuario) {
-        if(usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE)) {
+        if(usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE.getValor())) {
             Cliente cliente = new Cliente(usuario, LocalDate.now());
 
             cliente = clienteService.salvar(cliente);
@@ -111,6 +116,13 @@ public class UsuarioService {
         entityManager.detach(usuarioAtual);
 
         verificaSeCPFjaExiste(usuarioAtual);
+
+        if(usuarioAtual.getTipoPerfil().equals(TipoPerfil.CLIENTE.toString())) {
+            usuarioAtual.setTipoPerfil(TipoPerfil.CLIENTE.getValor());
+
+        } else {
+            usuarioAtual.setTipoPerfil(TipoPerfil.ADMIN.getValor());
+        }
 
         usuarioRepository.save(usuarioAtual);
 
@@ -129,7 +141,7 @@ public class UsuarioService {
     }
 
     private void verificaSeUsuarioEClienteEDeletaRegistros(Usuario usuario) {
-        if( usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE) ) {
+        if( usuario.getTipoPerfil().equals(TipoPerfil.CLIENTE.getValor()) ) {
             Cliente cliente = clienteService.buscarPorCpf(usuario.getCpf());
 
             entityManager.detach(cliente);
