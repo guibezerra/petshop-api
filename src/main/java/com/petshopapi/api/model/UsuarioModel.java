@@ -12,6 +12,6 @@ public class UsuarioModel {
     private Long idUsuario;
     private String cpf;
     private String nome;
-    private TipoPerfil tipoPerfil;
+    private String tipoPerfil;
     private ClienteModel cliente;
 }

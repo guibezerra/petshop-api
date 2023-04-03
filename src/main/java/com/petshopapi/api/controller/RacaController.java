@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 @RestController
@@ -51,6 +52,7 @@ public class RacaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RolesAllowed("ADMIN")
     public RacaModel cadastrarRaca(@RequestBody @Valid RacaInput racaInput) {
         Raca raca = racaInputDisassembler.toDomainObject(racaInput);
 
@@ -60,6 +62,7 @@ public class RacaController {
     }
 
     @PutMapping("/{idRaca}")
+    @RolesAllowed("ADMIN")
     public RacaModel atualizarRaca(@PathVariable Long idRaca, @Valid @RequestBody RacaInput racaInput) {
         Raca raca = racaService.buscarPorId(idRaca);
 
@@ -73,6 +76,7 @@ public class RacaController {
 
     @DeleteMapping("/{idRaca}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RolesAllowed("ADMIN")
     public void deletarRaca(@PathVariable Long idRaca) {
         racaService.deletar(idRaca);
     }

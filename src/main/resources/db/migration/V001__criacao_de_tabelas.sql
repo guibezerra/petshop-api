@@ -16,8 +16,8 @@ CREATE TABLE usuario (
     id_usuario BIGSERIAL NOT NULL,
     cpf varchar(14) NOT NULL,
     nome varchar(50) NOT NULL,
-    perfil varchar(7) NOT NULL,
-    senha varchar(8) NOT NULL,
+    perfil varchar(10) NOT NULL,
+    senha varchar(65) NOT NULL,
 
     PRIMARY KEY (id_usuario)
 );
