@@ -51,7 +51,7 @@ spring.datasource.url=jdbc:postgresql://localhost:{Porta-do-banco}/petshop_db
 Por fim, deve-se utilizar o Maven para realizar o download das dependências e o builder do projeto. Após isso, a aplicação encontra-se pronta para ser inicializada.
 
 ### Documentação 
-Para acessar a documentação, basta executat a aplicação e acessar a seguinte rota:
+Para acessar a documentação, basta executar a aplicação e acessar a seguinte rota:
 ```
 http://localhost:8080/swagger-ui/index.html
 ```
