@@ -21,7 +21,8 @@ alterar apenas os seus registros e/ou registros dos seus pets.
  * Spring Security.
 
 #### REQUISITOS ATENDIDOS
-* Banco de dados relacional JDK 17 ou superior
+* Banco de dados relacional
+* JDK 17 ou superior
 * Autenticação por token JWT 
 * Autorização role based
 * Implementar usando Springboot, Quarkus ou Micronaut
