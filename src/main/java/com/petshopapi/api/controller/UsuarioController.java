@@ -3,6 +3,7 @@ package com.petshopapi.api.controller;
 
 import com.petshopapi.api.assembler.UsuarioInputDisassembler;
 import com.petshopapi.api.assembler.UsuarioModelAssembler;
+import com.petshopapi.api.controller.openapi.UsuarioControllerOpenApi;
 import com.petshopapi.api.model.UsuarioModel;
 import com.petshopapi.api.model.input.UsuarioInput;
 import com.petshopapi.domain.model.Usuario;
@@ -21,7 +22,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value="/usuario")
-public class UsuarioController {
+public class UsuarioController implements UsuarioControllerOpenApi {
     @Autowired
     private UsuarioInputDisassembler usuarioInputDisassembler;
 

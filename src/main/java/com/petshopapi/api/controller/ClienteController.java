@@ -1,6 +1,7 @@
 package com.petshopapi.api.controller;
 
 import com.petshopapi.api.assembler.*;
+import com.petshopapi.api.controller.openapi.ClienteControllerOpenApi;
 import com.petshopapi.api.model.ClienteModel;
 import com.petshopapi.api.model.ContatoModel;
 import com.petshopapi.api.model.input.ClienteInput;
@@ -19,7 +20,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping(value="/cliente")
-public class ClienteController {
+public class ClienteController implements ClienteControllerOpenApi {
     @Autowired
     private ClienteService clienteService;
 

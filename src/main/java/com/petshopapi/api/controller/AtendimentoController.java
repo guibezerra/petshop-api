@@ -2,6 +2,7 @@ package com.petshopapi.api.controller;
 
 import com.petshopapi.api.assembler.AtendimentoInputDisassembler;
 import com.petshopapi.api.assembler.AtendimentoModelAssembler;
+import com.petshopapi.api.controller.openapi.AtendimentoControllerOpenApi;
 import com.petshopapi.api.model.AtendimentoModel;
 import com.petshopapi.api.model.input.AtendimentoInput;
 import com.petshopapi.domain.model.Atendimento;
@@ -18,7 +19,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("atendimento")
-public class AtendimentoController {
+public class AtendimentoController implements AtendimentoControllerOpenApi {
     @Autowired
     AtendimetoService atendimetoService;
 

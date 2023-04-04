@@ -2,6 +2,7 @@ package com.petshopapi.api.controller;
 
 import com.petshopapi.api.assembler.RacaInputDisassembler;
 import com.petshopapi.api.assembler.RacaModelAssembler;
+import com.petshopapi.api.controller.openapi.RacaControllerInterface;
 import com.petshopapi.api.model.RacaModel;
 import com.petshopapi.api.model.input.RacaInput;
 import com.petshopapi.domain.model.Raca;
@@ -19,7 +20,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/raca")
-public class RacaController {
+public class RacaController implements RacaControllerInterface {
     @Autowired
     RacaService racaService;
 
