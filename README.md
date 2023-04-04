@@ -47,8 +47,13 @@ Com o projeto aberto em sua IDE de preferência, deve-se acessar o arquivo appli
 spring.datasource.url=jdbc:postgresql://localhost:{Porta-do-banco}/petshop_db
 
 ```
-
 Por fim, deve-se utilizar o Maven para realizar o download das dependências e o builder do projeto. Após isso, a aplicação encontra-se pronta para ser inicializada.
+
+**Observação:**
+```
+Caso o lombok apresente erro, basta acessar o link https://projectlombok.org/download e realizar o download do exceutável.
+Logo após, deve ser feito a instalação em sua IDE.
+```
 
 ### Documentação 
 Para acessar a documentação, basta executar a aplicação e acessar a seguinte rota:
