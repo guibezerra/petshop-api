@@ -1,5 +1,6 @@
 package com.petshopapi.api.controller;
 
+import com.petshopapi.api.controller.openapi.AuthControllerOpenApi;
 import com.petshopapi.api.model.input.LoginInput;
 import com.petshopapi.domain.model.Usuario;
 import com.petshopapi.domain.service.TokenService;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/login")
-public class AuthController {
+public class AuthController implements AuthControllerOpenApi {
     @Autowired
     private AuthenticationManager authenticationManager;
 

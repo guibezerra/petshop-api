@@ -35,6 +35,8 @@ public class Configurations {
                 .permitAll()
                 .antMatchers(HttpMethod.POST, "/usuario")
                 .permitAll()
+                .antMatchers("/swagger-ui/**", "/javainuse-openapi/**", "/v3/api-docs/**")
+                .permitAll()
                 .anyRequest().authenticated().and().addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

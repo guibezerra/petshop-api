@@ -2,6 +2,7 @@ package com.petshopapi.api.controller;
 
 import com.petshopapi.api.assembler.PetInputDisassembler;
 import com.petshopapi.api.assembler.PetModelAssembler;
+import com.petshopapi.api.controller.openapi.PetControllerOpenAPI;
 import com.petshopapi.api.model.PetModel;
 import com.petshopapi.api.model.input.PetInput;
 import com.petshopapi.domain.model.Pet;
@@ -18,7 +19,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/pet")
-public class PetController {
+public class PetController implements PetControllerOpenAPI {
     @Autowired
     PetService petService;
 
