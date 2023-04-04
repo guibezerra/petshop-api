@@ -51,9 +51,9 @@ spring.datasource.url=jdbc:postgresql://localhost:{Porta-do-banco}/petshop_db
 Por fim, deve-se utilizar o Maven para realizar o download das dependências e o builder do projeto. Após isso, a aplicação encontra-se pronta para ser inicializada.
 
 **Observação:**
+Caso o lombok apresente erro, basta acessar o link abaixo e realizar o download do exceutável. Logo após, deve ser feito a instalação em sua IDE.
 ```
-Caso o lombok apresente erro, basta acessar o link https://projectlombok.org/download e realizar o download do exceutável.
-Logo após, deve ser feito a instalação em sua IDE.
+ link https://projectlombok.org/download 
 ```
 
 ### Documentação 
@@ -61,4 +61,4 @@ Para acessar a documentação, basta executar a aplicação e acessar a seguinte
 ```
 http://localhost:8080/swagger-ui/index.html
 ```
-Nela está contida a documentação gerada com o auxilio do Swagger, contendo a explicação de cada endpoint da aplicação.
+Nela está contida a documentação gerada com o auxílio do Swagger, contendo a explicação de cada endpoint da aplicação.
