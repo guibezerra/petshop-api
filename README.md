@@ -3,7 +3,7 @@
 #### DESCRIÇÃO DO PROJETO
    O projeto consiste na implementação de um sistema de controle e gerenciamento de uma loja Pet Shop. O diagrama UML 
 abaixo, foi utilizado como referência para o desenvolvimento do sistema onde usuários com perfil ADMIN tem permissão 
-para incluir, excluir, alterar e visualizar qualquer cadastro enquanto usuários com perfil CLIENTE pode visualizar e 
+para incluir, excluir, alterar e visualizar qualquer cadastro enquanto usuários com perfil CLIENTE podem visualizar e 
 alterar apenas os seus registros e/ou registros dos seus pets.
 
 <div align="center">
@@ -12,7 +12,7 @@ alterar apenas os seus registros e/ou registros dos seus pets.
 
 #### TECNOLOGIAS UTILIZADAS
  * Java 17.
- * Lombok
+ * Lombok.
  * Spring Boot.
  * Spring Data JPA.
  * Banco Relacional PostgreSQL.
